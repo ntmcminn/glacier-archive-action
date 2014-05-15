@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Definition of new Model -->
+<model name="glacier:archivemodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+    
+    <description>Glacier Archive Action for Alfresco - Content Model</description>
+    <author>Nathan McMinn</author>
+    <version>1.0</version>
+
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+    </imports>
+    
+    <!-- create the PDF toolkit namespace -->
+    <namespaces>
+        <namespace uri="http://www.alfresco.org/model/glacier/1.0" prefix="glacier" />
+    </namespaces>
+    
+    <aspects>
+        <aspect name="glacier:archived">
+            <title>Archived to Glacier</title>
+			<properties>
+                <!-- properties of the AWS Glacier Archive -->
+                <property name="glacier:archiveId">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="false"/>
+                </property>
+                <property name="glacier:glacierChecksum">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="false"/>
+                </property>
+                <property name="glacier:locationUri">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="false"/>
+                </property>
+            </properties>
+        </aspect>   
+    </aspects>
+</model>

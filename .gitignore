@@ -1,0 +1,8 @@
+
+eclipseWorkspace/*
+.settings
+.project
+glacier-archive/alfresco/*
+glacier-archive/share/*
+glacier-archive/solr/*
+glacier-archive/runner/*
