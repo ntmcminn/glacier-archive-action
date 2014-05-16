@@ -6,3 +6,8 @@ glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
 glacier-archive/runner/*
+glacier-archive/glacier-archive-repo/target*
+glacier-archive/glacier-archive-repo/tomcat*
+glacier-archive/glacier-archive-share/target*
+glacier-archive/glacier-archive-share/tomcat*
+
