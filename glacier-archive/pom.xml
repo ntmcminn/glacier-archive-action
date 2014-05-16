@@ -60,10 +60,6 @@
         if you are a Enterprise customer or Partner  
         -->
     <repositories>
-    	<repository>
-    		<id>alfresco-private</id>
-    		<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
-    	</repository>
         <repository>
             <id>alfresco-public</id>
             <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
@@ -77,4 +73,38 @@
     <module>glacier-archive-repo</module>
     <module>glacier-archive-share</module>
   </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Disables warnings in Eclipse -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.alfresco.maven.plugin</groupId>
+                                        <artifactId>alfresco-maven-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>set-version</goal>
+                                            <goal>add-amp-resources</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
 </project>
