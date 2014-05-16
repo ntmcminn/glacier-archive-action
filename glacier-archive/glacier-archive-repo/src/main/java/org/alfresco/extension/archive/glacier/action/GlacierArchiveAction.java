@@ -21,6 +21,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -57,11 +58,14 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(credentials);
 		client.setEndpoint(endpoint);
 		
+		// create the vault, this operation runs against AWS
 		createVault(client, vaultName);
+		
+		// prep the node for archiving (add aspect, set status, etc)
+		prepArchive(actionedNode);
 		
 		// if the vault creation was successful (or it already existed), proceed
 		// with the upload
-		
 		uploadArchive(client, actionedNode);
 
 	}
@@ -72,6 +76,17 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		// no action parameters at this time
 	}
 
+	private void prepArchive(NodeRef node)
+	{
+		NodeService ns = registry.getNodeService();
+		AuthenticationService as = registry.getAuthenticationService();
+		
+		Map<QName, Serializable> archiveProperties = new HashMap<QName, Serializable>();
+		archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVE_INITIATED_BY, as.getCurrentUserName());
+		archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVE_STATUS, GlacierArchiveModel.ARCHIVE_STATUS_IN_PROGRESS);
+		ns.addAspect(node, GlacierArchiveModel.ASPECT_ARCHIVED, archiveProperties);
+	}
+	
 	private CreateVaultResult createVault(AmazonGlacierClient client, String vaultName)
 	{
 		// create the vault.  Idempotent request, does nothing if the vault already 
@@ -86,6 +101,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 	private void uploadArchive(AmazonGlacierAsyncClient client, NodeRef toArchive)
 	{
 		NodeService ns = registry.getNodeService();
+		AuthenticationService as = registry.getAuthenticationService();
 		
 		try {
 			
@@ -96,9 +112,10 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 				.withBody(new RepeatableFileInputStream(stream2file(glacierUtil.getContentInputStream(toArchive))))
 				.withContentLength(glacierUtil.getContentSize(toArchive));
 			
+			
 			// NTM - this needs to be async, once I sort out some kind of callback
 			// mechanism and notification framework for Share
-			client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive, ""));
+			client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive, as.getCurrentUserName()));
 			
 		} catch (Exception e) {
 			throw new WebScriptException("Unable to send doc to AWS Glacier", e);
@@ -160,8 +177,29 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		@Override
 		public void onError(Exception ex) 
 		{
-			// probably not much we can do here except log the failure
 			logger.error(ex.getMessage(), ex);
+			final NodeService ns = registry.getNodeService();
+			
+			// does the node still exist?  Was it deleted before the archive
+			// operation could complete?
+			Boolean rtn = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Boolean>() {
+		        @Override
+		        public Boolean doWork() throws Exception {
+		        	
+		        	if(ns.exists(archivedNode))
+					{
+						Map<QName, Serializable> archiveProperties = new HashMap<QName, Serializable>();
+						archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVE_STATUS, GlacierArchiveModel.ARCHIVE_STATUS_FAILED);
+						ns.setProperties(archivedNode, archiveProperties);
+					}
+					else
+					{
+						logger.error("NodeRef " + archivedNode + " does not exist in repository, but was archived to AWS Glacier");
+					}
+		        	
+		        	return true;
+		        }
+		    }, user);
 		}
 
 		@Override
@@ -185,7 +223,8 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 						archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVEID, response.getArchiveId());
 						archiveProperties.put(GlacierArchiveModel.PROP_GLACIERCHECKSUM, response.getChecksum());
 						archiveProperties.put(GlacierArchiveModel.PROP_LOCATIONURI, response.getLocation());
-						ns.addAspect(archivedNode, GlacierArchiveModel.ASPECT_ARCHIVED, archiveProperties);
+						archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVE_STATUS, GlacierArchiveModel.ARCHIVE_STATUS_ARCHIVED);
+						ns.setProperties(archivedNode, archiveProperties);
 						
 						// if we are configured to clear the content stream, do so now
 						if(deleteContentStream)
@@ -201,7 +240,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		        	
 		        	return true;
 		        }
-		    }, "admin");
+		    }, user);
 		}
 		
 	}
