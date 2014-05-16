@@ -25,21 +25,31 @@
 		<property name="serviceRegistry">
 			<ref bean="ServiceRegistry" />
 		</property>
+		<property name="glacierUtil">
+		    <ref bean="GlacierUtil"/>
+		</property>
 		<property name="deleteContentStream">
-			<value>false</value>
+			<value>${glacier-archive.deleteContentStream}</value>
 		</property>
 		<property name="vaultName">
-			<value>nmcminn-glaciertest</value>
+			<value>${glacier-archive.vaultName}</value>
 		</property>
 		<property name="accessKey">
-			<value>redacted</value>
+			<value>${glacier-archive.accessKey}</value>
 		</property>
 		<property name="secretKey">
-			<value>redacted</value>
+			<value>${glacier-archive.secretKey}</value>
 		</property>
 		<property name="endpoint">
-			<value>https://glacier.us-east-1.amazonaws.com/</value>
+			<value>${glacier-archive.endpoint}</value>
 		</property>
     </bean>
+    
+    <bean id="GlacierUtil" class="org.alfresco.extension.archive.glacier.util.GlacierArchiveUtil">
+		<property name="serviceRegistry">
+			<ref bean="ServiceRegistry" />
+		</property>
+    </bean>
+    
     
 </beans>
