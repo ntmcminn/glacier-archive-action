@@ -1,4 +1,4 @@
-
+*.log
 eclipseWorkspace/*
 **/.settings
 **/.project
@@ -9,3 +9,4 @@ glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
 glacier-archive/runner/*
+glacier-archive/alf_data_dev/*

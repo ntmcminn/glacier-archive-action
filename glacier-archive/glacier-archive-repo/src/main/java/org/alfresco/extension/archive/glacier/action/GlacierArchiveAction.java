@@ -13,6 +13,7 @@ import org.alfresco.extension.archive.glacier.GlacierArchiveModel;
 import org.alfresco.extension.archive.glacier.util.GlacierArchiveUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -102,8 +103,6 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		} catch (Exception e) {
 			throw new WebScriptException("Unable to send doc to AWS Glacier", e);
 		}
-		
-		
 	}
 	
     public static final String PREFIX = "glacier";
@@ -164,35 +163,43 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		}
 
 		@Override
-		public void onSuccess(UploadArchiveRequest request, UploadArchiveResult response) 
+		public void onSuccess(UploadArchiveRequest request, final UploadArchiveResult response) 
 		{
 			// if the request was successful, persist the info required to 
 			// retrieve the content.  Delete the content stream if configured to
 			// do so.
-			NodeService ns = registry.getNodeService();
-			ContentService cs = registry.getContentService();
+			final NodeService ns = registry.getNodeService();
+			final ContentService cs = registry.getContentService();
 			
 			// does the node still exist?  Was it deleted before the archive
 			// operation could complete?
-			if(ns.exists(archivedNode))
-			{
-				Map<QName, Serializable> archiveProperties = new HashMap<QName, Serializable>();
-				archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVEID, response.getArchiveId());
-				archiveProperties.put(GlacierArchiveModel.PROP_GLACIERCHECKSUM, response.getChecksum());
-				archiveProperties.put(GlacierArchiveModel.PROP_LOCATIONURI, response.getLocation());
-				ns.addAspect(archivedNode, GlacierArchiveModel.ASPECT_ARCHIVED, archiveProperties);
-				
-				// if we are configured to clear the content stream, do so now
-				if(deleteContentStream)
-				{
-					ContentWriter writer = cs.getWriter(archivedNode, ContentModel.PROP_CONTENT, true);
-					writer.putContent("Archived to AWS Glacier");
-				}
-			}
-			else
-			{
-				logger.error("NodeRef " + archivedNode + " does not exist in repository, but was archived to AWS Glacier");
-			}
+			Boolean rtn = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Boolean>() {
+		        @Override
+		        public Boolean doWork() throws Exception {
+		        	
+		        	if(ns.exists(archivedNode))
+					{
+						Map<QName, Serializable> archiveProperties = new HashMap<QName, Serializable>();
+						archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVEID, response.getArchiveId());
+						archiveProperties.put(GlacierArchiveModel.PROP_GLACIERCHECKSUM, response.getChecksum());
+						archiveProperties.put(GlacierArchiveModel.PROP_LOCATIONURI, response.getLocation());
+						ns.addAspect(archivedNode, GlacierArchiveModel.ASPECT_ARCHIVED, archiveProperties);
+						
+						// if we are configured to clear the content stream, do so now
+						if(deleteContentStream)
+						{
+							ContentWriter writer = cs.getWriter(archivedNode, ContentModel.PROP_CONTENT, true);
+							writer.putContent("Archived to AWS Glacier");
+						}
+					}
+					else
+					{
+						logger.error("NodeRef " + archivedNode + " does not exist in repository, but was archived to AWS Glacier");
+					}
+		        	
+		        	return true;
+		        }
+		    }, "admin");
 		}
 		
 	}

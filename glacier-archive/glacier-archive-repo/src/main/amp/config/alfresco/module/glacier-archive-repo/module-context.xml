@@ -22,4 +22,13 @@
 	
     <import resource="classpath:alfresco/module/${artifactId}/context/service-context.xml" />
     
+    <!-- load the custom content model -->
+	<bean id="glacier.contentModel" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+		<property name="models">
+			<list>
+				<value>alfresco/module/${artifactId}/model/glacierArchiveModel.xml</value>
+			</list>
+		</property>
+	</bean>
+	
 </beans>
