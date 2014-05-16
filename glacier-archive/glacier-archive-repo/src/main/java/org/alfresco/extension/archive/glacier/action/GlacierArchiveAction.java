@@ -61,7 +61,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		// if the vault creation was successful (or it already existed), proceed
 		// with the upload
 		
-		uploadArchive(credentials, client, actionedNode);
+		uploadArchive(client, actionedNode);
 
 	}
 	
@@ -82,7 +82,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		return result;
 	}
 	
-	private void uploadArchive(BasicAWSCredentials credentials, AmazonGlacierAsyncClient client, NodeRef toArchive)
+	private void uploadArchive(AmazonGlacierAsyncClient client, NodeRef toArchive)
 	{
 		NodeService ns = registry.getNodeService();
 		
