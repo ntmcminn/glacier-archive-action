@@ -22,5 +22,5 @@ public interface GlacierArchiveModel {
  	static final QName PROP_RETRIEVAL_JOB_ID = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalJobId");
 
  	static enum ArchiveStatus { INPROGRESS, FAILED, ARCHIVED }
- 	static enum RetrievalStatus { INPROGRESS, FAILED, COMPLETE, RETRIEVED }
+ 	static enum RetrievalStatus { INPROGRESS, FAILED, RETRIEVED, RESTORED }
  }

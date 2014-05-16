@@ -32,6 +32,10 @@ import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.CreateVaultRequest;
 import com.amazonaws.services.glacier.model.CreateVaultResult;
+import com.amazonaws.services.glacier.model.DescribeJobRequest;
+import com.amazonaws.services.glacier.model.DescribeJobResult;
+import com.amazonaws.services.glacier.model.GetJobOutputRequest;
+import com.amazonaws.services.glacier.model.GetJobOutputResult;
 import com.amazonaws.services.glacier.model.InitiateJobRequest;
 import com.amazonaws.services.glacier.model.InitiateJobResult;
 import com.amazonaws.services.glacier.model.JobParameters;
@@ -141,6 +145,7 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
         return result;
     }
     
+    @Override
     public void archiveNode(
             NodeRef nodeRef, 
             String archiveContainerIdentifier, 
@@ -163,6 +168,7 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
         uploadArchive(getGlacierClient(), nodeRef, archiveContainerIdentifier, clearLocalContentStream);
     }
     
+    @Override
     public void initiateRetrieval(NodeRef nodeRef)
     {
         String archiveId = (String) nodeService.getProperty(
@@ -205,6 +211,63 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
                 retrievalJobId);
         retrievalProperties.put(GlacierArchiveModel.PROP_RETRIEVAL_STATUS, 
                 GlacierArchiveModel.RetrievalStatus.INPROGRESS);
+        nodeService.setProperties(nodeRef, retrievalProperties);
+    }
+    
+    @Override
+    public boolean isRetrievalComplete(NodeRef nodeRef)
+    {
+        String retrievalJobId = (String) nodeService.getProperty(
+                nodeRef, GlacierArchiveModel.PROP_RETRIEVAL_JOB_ID);
+        String locationUri = (String) nodeService.getProperty(
+                nodeRef, GlacierArchiveModel.PROP_LOCATIONURI);
+        if (retrievalJobId == null || locationUri == null)
+        {
+            throw new IllegalStateException(
+                    "Check of Glacier retrieval status can only be checked after the job has been initiated");
+        }
+        String vaultName = getVaultNameFromLocationUri(locationUri);
+        
+        DescribeJobRequest describeJobRequest = new DescribeJobRequest(vaultName, retrievalJobId);
+        DescribeJobResult describeJobResult = getGlacierClient().describeJob(describeJobRequest);
+        
+        boolean isComplete = describeJobResult.isCompleted();
+        
+        if (isComplete)
+        {
+            Map<QName, Serializable> retrievalProperties = new HashMap<QName, Serializable>();
+            retrievalProperties.put(GlacierArchiveModel.PROP_RETRIEVAL_STATUS, 
+                    GlacierArchiveModel.RetrievalStatus.RETRIEVED);
+            nodeService.setProperties(nodeRef, retrievalProperties);
+        }
+        return isComplete;
+    }
+    
+    @Override
+    public void restoreRetrieval(NodeRef nodeRef)
+    {
+        if (!isRetrievalComplete(nodeRef))
+        {
+            throw new IllegalStateException(
+                    "Restore of Glacier retrieval can only be attempted for completed retrieval requests");
+        }
+        String retrievalJobId = (String) nodeService.getProperty(
+                nodeRef, GlacierArchiveModel.PROP_RETRIEVAL_JOB_ID);
+        String locationUri = (String) nodeService.getProperty(
+                nodeRef, GlacierArchiveModel.PROP_LOCATIONURI);
+        String vaultName = getVaultNameFromLocationUri(locationUri);
+        
+        GetJobOutputRequest jobOutputRequest = new GetJobOutputRequest()
+            .withJobId(retrievalJobId)
+            .withVaultName(vaultName);
+        GetJobOutputResult jobOutputResult = getGlacierClient().getJobOutput(jobOutputRequest);
+        
+        ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+        writer.putContent(jobOutputResult.getBody());
+        
+        Map<QName, Serializable> retrievalProperties = new HashMap<QName, Serializable>();
+        retrievalProperties.put(GlacierArchiveModel.PROP_RETRIEVAL_STATUS, 
+                GlacierArchiveModel.RetrievalStatus.RESTORED);
         nodeService.setProperties(nodeRef, retrievalProperties);
     }
     
