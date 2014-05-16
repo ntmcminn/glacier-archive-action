@@ -6,3 +6,7 @@ glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
 glacier-archive/runner/*
+
+*.log
+
+glacier-archive/deploy.sh
