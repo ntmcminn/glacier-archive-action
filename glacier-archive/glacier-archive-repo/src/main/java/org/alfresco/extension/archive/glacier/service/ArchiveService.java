@@ -31,5 +31,27 @@ public interface ArchiveService
      * @param nodeRef the node ref to be retrieved
      */
     public void initiateRetrieval(NodeRef nodeRef);
+    
+    /**
+     * Checks whether or not the retrieval of the content from the archive container
+     * is complete.
+     * 
+     * @param nodeRef
+     * @return whether or not the retrieve operation is complete
+     */
+    public boolean isRetrievalComplete(NodeRef nodeRef);
+    
+    /**
+     * Restores the completed, retrieved content into the local repository content store.
+     * <p>
+     * Callers should check for completion with {@link #isRetrievalComplete(NodeRef)}
+     * before calling this method.
+     * <p>
+     * Implementations should throw an exception on attempts to restore an incomplete
+     * retrieval.
+     * 
+     * @param nodeRef
+     */
+    public void restoreRetrieval(NodeRef nodeRef);
 
 }
