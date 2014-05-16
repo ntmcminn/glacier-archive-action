@@ -201,7 +201,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		        	
 		        	return true;
 		        }
-		    }, user);
+		    }, "admin");
 		}
 		
 	}
