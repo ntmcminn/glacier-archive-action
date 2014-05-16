@@ -22,9 +22,15 @@
     <!-- Glacier archive action -->
     <bean id="org.alfresco.extension.glacier-archive.action" class="org.alfresco.extension.archive.glacier.action.GlacierArchiveAction"
 		parent="action-executer">
-		<property name="serviceRegistry">
-			<ref bean="ServiceRegistry" />
+		<property name="nodeService">
+			<ref bean="NodeService" />
 		</property>
+        <property name="authenticationService">
+            <ref bean="AuthenticationService" />
+        </property>
+        <property name="contentService">
+            <ref bean="ContentService" />
+        </property>
 		<property name="glacierUtil">
 		    <ref bean="GlacierUtil"/>
 		</property>
