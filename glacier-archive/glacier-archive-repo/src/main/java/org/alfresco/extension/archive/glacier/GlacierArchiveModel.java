@@ -2,15 +2,13 @@ package org.alfresco.extension.archive.glacier;
 
 import org.alfresco.service.namespace.QName;
 
+/**
+ * Data model definitions for AWS Glacier archive operations
+ */
 public interface GlacierArchiveModel {
 
 	// namespace
     static final String GLACIER_ARCHIVE_MODEL_1_0_URI = "http://www.alfresco.org/model/glacier/1.0";
-    
-    // status values
-    static final String ARCHIVE_STATUS_IN_PROGRESS = "INPROGRESS";
-    static final String ARCHIVE_STATUS_FAILED = "FAILED";
-    static final String ARCHIVE_STATUS_ARCHIVED = "ARCHIVED";
     
     // archived aspect and properties
  	static final QName ASPECT_ARCHIVED = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archived");
@@ -23,4 +21,6 @@ public interface GlacierArchiveModel {
  	static final QName PROP_RETRIEVAL_STATUS = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalStatus");
  	static final QName PROP_RETRIEVAL_JOB_ID = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalJobId");
 
-}
+ 	static enum ArchiveStatus { INPROGRESS, FAILED, ARCHIVED }
+ 	static enum RetrievalStatus { INPROGRESS, FAILED, COMPLETE, RETRIEVED }
+ }
