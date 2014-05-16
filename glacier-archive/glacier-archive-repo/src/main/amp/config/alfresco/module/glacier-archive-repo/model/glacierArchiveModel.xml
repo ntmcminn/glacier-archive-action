@@ -13,7 +13,7 @@
         <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
     </imports>
     
-    <!-- create the PDF toolkit namespace -->
+    <!-- create the AWS Glacier namespace -->
     <namespaces>
         <namespace uri="http://www.alfresco.org/model/glacier/1.0" prefix="glacier" />
     </namespaces>

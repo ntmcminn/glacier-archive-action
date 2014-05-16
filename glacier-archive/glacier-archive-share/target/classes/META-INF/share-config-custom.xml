@@ -1,3 +1,49 @@
 <alfresco-config>
 
+	<config evaluator="aspect" condition="glacier:archived">
+		<forms>
+			<form>
+				<field-visibility>
+					<show id="archiveId" />
+					<show id="glacierChecksum" />
+					<show id="locationUri" />
+				</field-visibility>
+				<appearance>
+					<field id="archiveId" label-id="prop.glacier_archiveId" read-only="true" />
+					<field id="glacierChecksum" label-id="prop.glacier_glacierChecksum" read-only="true" />
+					<field id="locationUri" label-id="prop.glacier_locationUri" read-only="true" />
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+    <config evaluator="string-compare" condition="DocLibActions">
+        <actions>
+            <action id="glacier-archive" type="javascript" label="prop.action_glacierArchive" icon="glacier-archive-action">
+                <param name="function">onGlacierArchiveAction</param>
+                <permissions>
+                    <permission allow="true">Write</permission>
+                </permissions>
+                <param name="action">org.alfresco.extension.glacier-archive.action</param>
+                <param name="successMessage">message.glacier-archive.archived</param>
+                <param name="failureMessage">message.glacier-archive.failure</param>
+                <evaluator negate="true">evaluator.doclib.aspect.archived</evaluator>
+            </action>
+        </actions>
+        <actionGroups>
+            <actionGroup id="document-browse">
+                <action index="600" id="glacier-archive" />
+            </actionGroup>
+            <actionGroup id="document-details">
+                <action index="600" id="glacier-archive" />
+            </actionGroup>
+        </actionGroups>        
+    </config>
+    
+	<config evaluator="string-compare" condition="DocLibCustom">
+          <dependencies>
+             <js src="components/documentlibrary/glacier-archive-action-share.js" />             
+          </dependencies>       
+    </config>
+		
 </alfresco-config>
