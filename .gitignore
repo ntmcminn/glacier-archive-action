@@ -2,7 +2,9 @@
 eclipseWorkspace/*
 **/.settings
 **/.project
-**/target
+**/.classpath
+**/target/
+**/bin/
 glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
