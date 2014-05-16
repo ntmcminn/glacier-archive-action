@@ -18,42 +18,42 @@
 	
 -->
 <beans>
-    
-    <!-- Glacier archive action -->
-    <bean id="org.alfresco.extension.glacier-archive.action" class="org.alfresco.extension.archive.glacier.action.GlacierArchiveAction"
-		parent="action-executer">
-		<property name="nodeService">
-			<ref bean="NodeService" />
-		</property>
+
+    <bean id="archiveService" class="org.alfresco.extension.archive.glacier.service.ArchiveServiceGlacierImpl">
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
         <property name="authenticationService">
             <ref bean="AuthenticationService" />
         </property>
         <property name="contentService">
             <ref bean="ContentService" />
         </property>
-		<property name="glacierUtil">
-		    <ref bean="GlacierUtil"/>
+        <property name="glacierUtil">
+            <ref bean="GlacierUtil"/>
+        </property>
+        <property name="accessKey">
+            <value>${glacier-archive.accessKey}</value>
+        </property>
+        <property name="secretKey">
+            <value>${glacier-archive.secretKey}</value>
+        </property>
+        <property name="endpoint">
+            <value>${glacier-archive.endpoint}</value>
+        </property>
+    </bean>
+    
+    <!-- Glacier archive action -->
+    <bean id="org.alfresco.extension.glacier-archive.action" class="org.alfresco.extension.archive.glacier.action.GlacierArchiveAction"
+		parent="action-executer">
+		<property name="archiveService">
+			<ref bean="archiveService" />
 		</property>
 		<property name="deleteContentStream">
 			<value>${glacier-archive.deleteContentStream}</value>
 		</property>
 		<property name="vaultName">
 			<value>${glacier-archive.vaultName}</value>
-		</property>
-		<property name="accessKey">
-			<value>${glacier-archive.accessKey}</value>
-		</property>
-		<property name="secretKey">
-			<value>${glacier-archive.secretKey}</value>
-		</property>
-		<property name="endpoint">
-			<value>${glacier-archive.endpoint}</value>
-		</property>
-    </bean>
-    
-    <bean id="GlacierUtil" class="org.alfresco.extension.archive.glacier.util.GlacierArchiveUtil">
-		<property name="serviceRegistry">
-			<ref bean="ServiceRegistry" />
 		</property>
     </bean>
     
