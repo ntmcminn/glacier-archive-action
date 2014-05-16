@@ -9,14 +9,3 @@ glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
 glacier-archive/runner/*
-glacier-archive/glacier-archive-repo/target*
-glacier-archive/glacier-archive-repo/tomcat*
-glacier-archive/glacier-archive-share/target*
-glacier-archive/glacier-archive-share/tomcat*
-
-
-glacier-archive/glacier-archive-repo/target/test-classes/test-log4j.properties
-
-glacier-archive/glacier-archive-share/target/test-classes/test-log4j.properties
-
-glacier-archive/glacier-archive-share/target/classes/META-INF/share-config-custom.xml
