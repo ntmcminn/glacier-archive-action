@@ -11,22 +11,23 @@ import org.alfresco.service.cmr.repository.NodeRef;
 public class GlacierArchiveUtil 
 {
 
-	private ServiceRegistry registry;
-	
-	public GlacierArchiveUtil(ServiceRegistry registry)
-	{
-		this.registry = registry;
-	}
+	private ServiceRegistry serviceRegistry;
 	
 	public String generateChecksum(NodeRef node)
 	{
-		return "";
+		ContentService cs = serviceRegistry.getContentService();
+		ContentReader reader = cs.getReader(node, ContentModel.PROP_CONTENT);
+		return GlacierHashGenerator.getHash(reader);
 	}
 	
 	public InputStream getContentInputStream(NodeRef node)
 	{
-		ContentService cs = registry.getContentService();
+		ContentService cs = serviceRegistry.getContentService();
 		ContentReader reader = cs.getReader(node, ContentModel.PROP_CONTENT);
 		return reader.getContentInputStream();
+	}
+
+	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
 	}
 }

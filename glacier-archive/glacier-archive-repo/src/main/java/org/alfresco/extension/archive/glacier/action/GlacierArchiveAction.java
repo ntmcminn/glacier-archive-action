@@ -1,5 +1,10 @@
 package org.alfresco.extension.archive.glacier.action;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -8,17 +13,16 @@ import java.util.Map;
 import org.alfresco.extension.archive.glacier.GlacierArchiveModel;
 import org.alfresco.extension.archive.glacier.util.GlacierArchiveUtil;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,21 +45,23 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 	private String vaultName;
 	private String accessKey;
 	private String secretKey;
-	private String endpoint = "https://glacier.us-east-1.amazonaws.com/";
+	private String endpoint;
 	
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedNode) 
 	{
+		
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(credentials);
 		client.setEndpoint(endpoint);
 		
-		CreateVaultResult result = createVault(client, vaultName);
+		createVault(client, vaultName);
 		
 		// if the vault creation was successful (or it already existed), proceed
 		// with the upload
 		
 		uploadArchive(client, actionedNode);
+
 	}
 	
 	@Override
@@ -79,16 +85,36 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 	{
 		NodeService ns = registry.getNodeService();
 		
+		// AB - Once it's working this need to be moved to GlacierUtil 
+		FileInputStream fis = null;
+		try {
+		    fis = new FileInputStream(stream2file(glacierUtil.getContentInputStream(toArchive)));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
 		UploadArchiveRequest request = new UploadArchiveRequest()
 			.withArchiveDescription(String.valueOf(ns.getProperty(toArchive, ContentModel.PROP_NAME)))
 			.withChecksum(glacierUtil.generateChecksum(toArchive))
 			.withVaultName(vaultName)
-			.withBody(glacierUtil.getContentInputStream(toArchive));
+			.withBody(fis);
 		
 		// NTM - this needs to be async, once I sort out some kind of callback
 		// mechanism and notification framework for Share
 		client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive));
 	}
+	
+    public static final String PREFIX = "glacier";
+    public static final String SUFFIX = ".tmp";
+
+    public static File stream2file (InputStream in) throws IOException {
+        final File tempFile = File.createTempFile(PREFIX, SUFFIX);
+        tempFile.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            IOUtils.copy(in, out);
+        }
+        return tempFile;
+    }	
 	
 	public void setVaultName(String vaultName) {
 		this.vaultName = vaultName;
@@ -111,6 +137,14 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		this.registry = registry;
 	}
 	
+	public void setDeleteContentStream(boolean deleteContentStream) {
+		this.deleteContentStream = deleteContentStream;
+	}
+	
+	public void setGlacierUtil(GlacierArchiveUtil glacierUtil) {
+		this.glacierUtil = glacierUtil;
+	}
+	
 	private class GlacierArchiveResponseHandler implements AsyncHandler<UploadArchiveRequest, UploadArchiveResult>
 	{
 		private NodeRef archivedNode;
@@ -124,13 +158,13 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		public void onError(Exception ex) 
 		{
 			// probably not much we can do here except log the failure
-			logger.error(ex);
+			logger.error(ex.getMessage(), ex);
 		}
 
 		@Override
 		public void onSuccess(UploadArchiveRequest request, UploadArchiveResult response) 
 		{
-			// if the request was successful, persist the info requried to 
+			// if the request was successful, persist the info required to 
 			// retrieve the content.  Delete the content stream if configured to
 			// do so.
 			NodeService ns = registry.getNodeService();
@@ -160,4 +194,5 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		}
 		
 	}
+
 }

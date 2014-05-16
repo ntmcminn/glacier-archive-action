@@ -23,17 +23,11 @@
             <groupId>${alfresco.groupId}</groupId>
             <artifactId>alfresco-repository</artifactId>
         </dependency>
-        <!-- Need the Amazon Java SDK for simple access to AWS services -->
+        <!-- Need the Amazon Java SDK for simple access to AWS services (1.4.7 is the last version using http client 4.1.1) -->
         <dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
-			<version>1.7.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2</version>
-			<scope>provided</scope>
+			<version>1.4.7</version>
 		</dependency>
     </dependencies>
     
