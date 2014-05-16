@@ -12,5 +12,10 @@ public interface GlacierArchiveModel {
  	static final QName PROP_ARCHIVEID = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archiveId");
  	static final QName PROP_GLACIERCHECKSUM = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "glacierChecksum");
  	static final QName PROP_LOCATIONURI = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "locationUri");
+ 	static final QName PROP_ARCHIVE_INITIATED_BY = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archiveInitiatedBy");
+ 	static final QName PROP_RETRIEVAL_INITIATED_BY = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalInitiatedBy");
+ 	static final QName PROP_ARCHIVE_STATUS = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archiveStatus");
+ 	static final QName PROP_RETRIEVAL_STATUS = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalStatus");
+ 	static final QName PROP_RETRIEVAL_JOB_ID = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalJobId");
 
 }

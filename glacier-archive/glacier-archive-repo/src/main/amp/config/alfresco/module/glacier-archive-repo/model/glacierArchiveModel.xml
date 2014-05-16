@@ -38,6 +38,31 @@
                     <multiple>false</multiple>
                     <index enabled="false"/>
                 </property>
+                <property name="glacier:archiveInitiatedBy">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="true"/>
+                </property>
+                <property name="glacier:retrievalInitiatedBy">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="true"/>
+                </property>
+                <property name="glacier:archiveStatus">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="true"/>
+                </property>
+                <property name="glacier:retrievalStatus">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="true"/>
+                </property>
+                <property name="glacier:retrievalJobId">
+                    <type>d:text</type>
+                    <multiple>false</multiple>
+                    <index enabled="false"/>
+                </property>
             </properties>
         </aspect>   
     </aspects>

@@ -98,7 +98,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 			
 			// NTM - this needs to be async, once I sort out some kind of callback
 			// mechanism and notification framework for Share
-			client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive));
+			client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive, ""));
 			
 		} catch (Exception e) {
 			throw new WebScriptException("Unable to send doc to AWS Glacier", e);
@@ -149,10 +149,12 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 	private class GlacierArchiveResponseHandler implements AsyncHandler<UploadArchiveRequest, UploadArchiveResult>
 	{
 		private NodeRef archivedNode;
+		private String user;
 		
-		public GlacierArchiveResponseHandler(NodeRef archivedNode)
+		public GlacierArchiveResponseHandler(NodeRef archivedNode, String user)
 		{
 			this.archivedNode = archivedNode;
+			this.user = user;
 		}
 		
 		@Override
@@ -199,7 +201,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		        	
 		        	return true;
 		        }
-		    }, "admin");
+		    }, user);
 		}
 		
 	}
