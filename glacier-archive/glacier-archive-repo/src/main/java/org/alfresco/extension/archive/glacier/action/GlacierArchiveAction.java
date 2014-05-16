@@ -1,7 +1,6 @@
 package org.alfresco.extension.archive.glacier.action;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +24,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.extensions.webscripts.WebScriptException;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.handlers.AsyncHandler;
@@ -34,6 +34,7 @@ import com.amazonaws.services.glacier.model.CreateVaultRequest;
 import com.amazonaws.services.glacier.model.CreateVaultResult;
 import com.amazonaws.services.glacier.model.UploadArchiveRequest;
 import com.amazonaws.services.glacier.model.UploadArchiveResult;
+import com.amazonaws.services.s3.internal.RepeatableFileInputStream;
 
 public class GlacierArchiveAction extends ActionExecuterAbstractBase 
 {
@@ -60,7 +61,7 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		// if the vault creation was successful (or it already existed), proceed
 		// with the upload
 		
-		uploadArchive(client, actionedNode);
+		uploadArchive(credentials, client, actionedNode);
 
 	}
 	
@@ -81,27 +82,28 @@ public class GlacierArchiveAction extends ActionExecuterAbstractBase
 		return result;
 	}
 	
-	private void uploadArchive(AmazonGlacierAsyncClient client, NodeRef toArchive)
+	private void uploadArchive(BasicAWSCredentials credentials, AmazonGlacierAsyncClient client, NodeRef toArchive)
 	{
 		NodeService ns = registry.getNodeService();
 		
-		// AB - Once it's working this need to be moved to GlacierUtil 
-		FileInputStream fis = null;
 		try {
-		    fis = new FileInputStream(stream2file(glacierUtil.getContentInputStream(toArchive)));
+			
+			UploadArchiveRequest request = new UploadArchiveRequest()
+				.withArchiveDescription(String.valueOf(ns.getProperty(toArchive, ContentModel.PROP_NAME)))
+				.withChecksum(glacierUtil.generateChecksum(toArchive))
+				.withVaultName(vaultName)
+				.withBody(new RepeatableFileInputStream(stream2file(glacierUtil.getContentInputStream(toArchive))))
+				.withContentLength(glacierUtil.getContentSize(toArchive));
+			
+			// NTM - this needs to be async, once I sort out some kind of callback
+			// mechanism and notification framework for Share
+			client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive));
+			
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			throw new WebScriptException("Unable to send doc to AWS Glacier", e);
 		}
 		
-		UploadArchiveRequest request = new UploadArchiveRequest()
-			.withArchiveDescription(String.valueOf(ns.getProperty(toArchive, ContentModel.PROP_NAME)))
-			.withChecksum(glacierUtil.generateChecksum(toArchive))
-			.withVaultName(vaultName)
-			.withBody(fis);
 		
-		// NTM - this needs to be async, once I sort out some kind of callback
-		// mechanism and notification framework for Share
-		client.uploadArchiveAsync(request, new GlacierArchiveResponseHandler(toArchive));
 	}
 	
     public static final String PREFIX = "glacier";

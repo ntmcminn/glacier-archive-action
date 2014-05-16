@@ -20,6 +20,12 @@ public class GlacierArchiveUtil
 		return GlacierHashGenerator.getHash(reader);
 	}
 	
+	public long getContentSize(NodeRef node) {
+		ContentService cs = serviceRegistry.getContentService();
+		ContentReader reader = cs.getReader(node, ContentModel.PROP_CONTENT);
+		return reader.getSize();
+	}
+	
 	public InputStream getContentInputStream(NodeRef node)
 	{
 		ContentService cs = serviceRegistry.getContentService();
