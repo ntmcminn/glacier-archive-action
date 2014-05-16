@@ -1,7 +1,8 @@
 
 eclipseWorkspace/*
-.settings
-.project
+**/.settings
+**/.project
+**/target
 glacier-archive/alfresco/*
 glacier-archive/share/*
 glacier-archive/solr/*
