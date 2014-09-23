@@ -98,8 +98,8 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
         if (glacierClient == null)
         {
             BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-            AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(credentials);
-            client.setEndpoint(endpoint);
+            glacierClient = new AmazonGlacierAsyncClient(credentials);
+            glacierClient.setEndpoint(endpoint);
         }
         return glacierClient;
     }
