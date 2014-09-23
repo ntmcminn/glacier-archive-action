@@ -17,6 +17,17 @@
 		</forms>
 	</config>
 	
+	<config evaluator="string-compare" condition="DocumentLibrary">
+        <indicators>
+            <indicator id="evaluator.flacier.doclib.indicator.isArchived"
+                       icon="glacier-archived-16.png"
+                       index="504"
+                       label="indicator.glacier.archived">
+                <evaluator>evaluator.doclib.aspect.archived</evaluator>
+            </indicator>
+        </indicators>
+    </config>
+    
     <config evaluator="string-compare" condition="DocLibActions">
         <actions>
             <action id="glacier-archive" type="javascript" label="prop.action_glacierArchive" icon="glacier-archive-action">
@@ -29,13 +40,26 @@
                 <param name="failureMessage">message.glacier-archive.failure</param>
                 <evaluator negate="true">evaluator.doclib.aspect.archived</evaluator>
             </action>
+            
+            <action id="glacier-unarchive" type="javascript" label="prop.action_glacierUnArchive" icon="glacier-archive-action">
+                <param name="function">onGlacierUnArchiveAction</param>
+                <permissions>
+                    <permission allow="true">Write</permission>
+                </permissions>
+                <param name="action">org.alfresco.extension.glacier-unarchive.action</param>
+                <param name="successMessage">message.glacier-unarchive.archived</param>
+                <param name="failureMessage">message.glacier-unarchive.failure</param>
+                <evaluator negate="false">evaluator.doclib.aspect.archived</evaluator>
+            </action>
         </actions>
         <actionGroups>
             <actionGroup id="document-browse">
                 <action index="600" id="glacier-archive" />
+                <action index="601" id="glacier-unarchive"/>
             </actionGroup>
             <actionGroup id="document-details">
                 <action index="600" id="glacier-archive" />
+                <action index="601" id="glacier-unarchive"/>
             </actionGroup>
         </actionGroups>        
     </config>
