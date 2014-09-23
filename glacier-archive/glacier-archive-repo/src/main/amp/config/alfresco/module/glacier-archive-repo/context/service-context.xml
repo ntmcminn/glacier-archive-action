@@ -29,9 +29,6 @@
         <property name="contentService">
             <ref bean="ContentService" />
         </property>
-        <property name="glacierUtil">
-            <ref bean="GlacierUtil"/>
-        </property>
         <property name="accessKey">
             <value>${glacier-archive.accessKey}</value>
         </property>
@@ -51,6 +48,17 @@
 		</property>
 		<property name="deleteContentStream">
 			<value>${glacier-archive.deleteContentStream}</value>
+		</property>
+		<property name="vaultName">
+			<value>${glacier-archive.vaultName}</value>
+		</property>
+    </bean>
+    
+    <!-- Glacier archive action -->
+    <bean id="org.alfresco.extension.glacier-unarchive.action" class="org.alfresco.extension.archive.glacier.action.GlacierRetrievalInitationAction"
+		parent="action-executer">
+		<property name="archiveService">
+			<ref bean="archiveService" />
 		</property>
 		<property name="vaultName">
 			<value>${glacier-archive.vaultName}</value>
