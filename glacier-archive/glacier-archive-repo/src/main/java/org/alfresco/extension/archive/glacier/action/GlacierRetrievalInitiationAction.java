@@ -6,7 +6,7 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 
-/**
+/** 
  * Action for initiating a retrieval of content from AWS Glacier
  */
 public class GlacierRetrievalInitiationAction extends AbstractGlacierAction {

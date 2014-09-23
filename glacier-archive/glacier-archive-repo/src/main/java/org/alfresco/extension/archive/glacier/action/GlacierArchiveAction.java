@@ -9,7 +9,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 public class GlacierArchiveAction extends AbstractGlacierAction 
 {
 	private boolean deleteContentStream = false;
-	private String vaultName;
 	
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedNode) 
@@ -23,10 +22,7 @@ public class GlacierArchiveAction extends AbstractGlacierAction
 		// no action parameters at this time
 	    // TODO Perhaps vaultName and deleteContentStream should be action params
 	}
-	
-	public void setVaultName(String vaultName) {
-		this.vaultName = vaultName;
-	}
+
 
 	public void setDeleteContentStream(boolean deleteContentStream) {
 		this.deleteContentStream = deleteContentStream;
