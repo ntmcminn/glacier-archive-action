@@ -412,7 +412,7 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
                         archiveProperties.put(GlacierArchiveModel.PROP_GLACIERCHECKSUM, response.getChecksum());
                         archiveProperties.put(GlacierArchiveModel.PROP_LOCATIONURI, response.getLocation());
                         archiveProperties.put(GlacierArchiveModel.PROP_ARCHIVE_STATUS, GlacierArchiveModel.ArchiveStatus.ARCHIVED);
-                        nodeService.setProperties(archivedNode, archiveProperties);
+                        nodeService.addProperties(archivedNode, archiveProperties);
                         
                         // if we are configured to clear the content stream, do so now
                         if(clearLocalContentStream)
