@@ -211,7 +211,10 @@ public class ArchiveServiceGlacierImpl implements ArchiveService
                 retrievalJobId);
         retrievalProperties.put(GlacierArchiveModel.PROP_RETRIEVAL_STATUS, 
                 GlacierArchiveModel.RetrievalStatus.INPROGRESS);
-        nodeService.setProperties(nodeRef, retrievalProperties);
+        nodeService.addProperties(nodeRef, retrievalProperties);
+        
+        // add marker aspect for retrieval
+        nodeService.addAspect(nodeRef, GlacierArchiveModel.ASPECT_RETRIEVAL_INITIATED, null);
     }
     
     @Override

@@ -41,25 +41,41 @@
                 <evaluator negate="true">evaluator.doclib.aspect.archived</evaluator>
             </action>
             
-            <action id="glacier-unarchive" type="javascript" label="prop.action_glacierUnArchive" icon="glacier-archive-action">
-                <param name="function">onGlacierUnArchiveAction</param>
+            <action id="glacier-retrieval-initiate" type="javascript" label="prop.action_glacierInitiateRetrieval" icon="glacier-archive-action">
+                <param name="function">onGlacierInitiateRetrievalAction</param>
                 <permissions>
                     <permission allow="true">Write</permission>
                 </permissions>
-                <param name="action">org.alfresco.extension.glacier-unarchive.action</param>
-                <param name="successMessage">message.glacier-unarchive.archived</param>
-                <param name="failureMessage">message.glacier-unarchive.failure</param>
+                <param name="action">org.alfresco.extension.glacier-retrieval-initiate.action</param>
+                <param name="successMessage">message.glacier-retrieval-initiate.requested</param>
+                <param name="failureMessage">message.glacier-retrieval-initiate.failure</param>
                 <evaluator negate="false">evaluator.doclib.aspect.archived</evaluator>
+                <evaluator negate="true">evaluator.doclib.aspect.retrievalInitiated</evaluator>
             </action>
+            
+            <action id="glacier-retrieval" type="javascript" label="prop.action_glacierRetrieval" icon="glacier-archive-action">
+                <param name="function">onGlacierRetrievalAction</param>
+                <permissions>
+                    <permission allow="true">Write</permission>
+                </permissions>
+                <param name="action">org.alfresco.extension.glacier-retrieval.action</param>
+                <param name="successMessage">message.glacier-retrieval.requested</param>
+                <param name="failureMessage">message.glacier-retrieval.failure</param>
+                <evaluator negate="false">evaluator.doclib.aspect.archived</evaluator>
+                <evaluator negate="false">evaluator.doclib.aspect.retrievalInitiated</evaluator>
+            </action>
+            
         </actions>
         <actionGroups>
             <actionGroup id="document-browse">
                 <action index="600" id="glacier-archive" />
-                <action index="601" id="glacier-unarchive"/>
+                <action index="601" id="glacier-retrieval-initiate"/>
+                <action index="602" id="glacier-retrieval"/>
             </actionGroup>
             <actionGroup id="document-details">
                 <action index="600" id="glacier-archive" />
-                <action index="601" id="glacier-unarchive"/>
+                <action index="601" id="glacier-retrieval-initiate"/>
+                <action index="602" id="glacier-retrieval"/>
             </actionGroup>
         </actionGroups>        
     </config>

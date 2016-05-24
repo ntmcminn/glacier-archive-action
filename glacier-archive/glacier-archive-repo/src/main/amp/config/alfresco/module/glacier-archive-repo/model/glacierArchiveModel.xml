@@ -65,5 +65,9 @@
                 </property>
             </properties>
         </aspect>   
+        
+        <aspect name="glacier:retrievalInitiated">
+            <title>Archived to Glacier</title>
+        </aspect>
     </aspects>
 </model>

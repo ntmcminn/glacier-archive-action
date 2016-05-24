@@ -20,4 +20,12 @@
       </property>
    </bean>   
 
+   <!-- Glacier Retrieval in progress aspect evaluator -->
+   <bean id="evaluator.doclib.aspect.retrievalInitiated" class="org.alfresco.web.evaluator.HasAspectEvaluator">
+      <property name="aspects">
+         <list>
+            <value>glacier:retrievalInitiated</value>
+         </list>
+      </property>
+   </bean>
 </beans>

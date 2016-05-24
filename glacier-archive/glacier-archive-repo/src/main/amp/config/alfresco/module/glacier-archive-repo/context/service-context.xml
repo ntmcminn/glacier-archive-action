@@ -55,7 +55,7 @@
     </bean>
     
     <!-- Glacier archive action -->
-    <bean id="org.alfresco.extension.glacier-unarchive.action" class="org.alfresco.extension.archive.glacier.action.GlacierRetrievalInitationAction"
+    <bean id="org.alfresco.extension.glacier-retrieval-initiate.action" class="org.alfresco.extension.archive.glacier.action.GlacierRetrievalInitiationAction"
 		parent="action-executer">
 		<property name="archiveService">
 			<ref bean="archiveService" />
@@ -65,4 +65,14 @@
 		</property>
     </bean>
     
+    <!-- Glacier archive action -->
+    <bean id="org.alfresco.extension.glacier-retrieval.action" class="org.alfresco.extension.archive.glacier.action.GlacierRetrievalAction"
+		parent="action-executer">
+		<property name="archiveService">
+			<ref bean="archiveService" />
+		</property>
+		<property name="vaultName">
+			<value>${glacier-archive.vaultName}</value>
+		</property>
+    </bean>
 </beans>

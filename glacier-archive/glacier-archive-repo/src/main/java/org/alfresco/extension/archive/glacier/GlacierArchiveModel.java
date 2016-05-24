@@ -12,6 +12,7 @@ public interface GlacierArchiveModel {
     
     // archived aspect and properties
  	static final QName ASPECT_ARCHIVED = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archived");
+ 	static final QName ASPECT_RETRIEVAL_INITIATED = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "retrievalInitiated");
  	static final QName PROP_ARCHIVEID = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "archiveId");
  	static final QName PROP_GLACIERCHECKSUM = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "glacierChecksum");
  	static final QName PROP_LOCATIONURI = QName.createQName(GLACIER_ARCHIVE_MODEL_1_0_URI, "locationUri");
